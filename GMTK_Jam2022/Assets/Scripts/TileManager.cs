@@ -17,16 +17,13 @@ public class TileManager : MonoBehaviour
         {
             instance = this;
         }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        foreach(Tile tile in GameObject.FindObjectsOfType<Tile>())
+        foreach (Tile tile in GameObject.FindObjectsOfType<Tile>())
         {
+            tile._coord = PositionToCoord(tile.transform.position);
             tileDict.Add(tile._coord, tile);
         }
-        
     }
+  
 
     // Update is called once per frame
     void Update()
