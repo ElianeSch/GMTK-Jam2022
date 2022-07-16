@@ -18,20 +18,11 @@ public class Dice : MonoBehaviour
         _coord = TileManager.instance.PositionToCoord(transform.position);
         currentTile = TileManager.instance.GetTileFromCoord(_coord);
 
-        for(int i = 0; i<6;i++)
-        {
-            ChangeFace(i, FaceManager.instance.allFacesPrefabs[i]);
-        }
-
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            ChangeFace(5, FaceManager.instance.allFacesPrefabs[1]);
-        }
-            if (!_isMoving)
+            if (!_isMoving && !ViewManager.instance._isRotating)
         {
             
             if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -80,7 +71,7 @@ public class Dice : MonoBehaviour
         currentTile = TileManager.instance.GetTileFromCoord(_coord);
         if (currentTile.GetComponent<FaceTile>() != null)
         {
-            ChangeFace(5, currentTile.GetComponent<FaceTile>().facePrefab);
+            ChangeFace(5, currentTile.GetComponent<FaceTile>().face);
         }
     }
     private bool CanDiceMoveHere(Vector3 dir)
@@ -96,14 +87,22 @@ public class Dice : MonoBehaviour
 
     }
 
-    private void ChangeFace(int posOnDice, Face facePrefab)
+    private void ChangeFace(int posOnDice, Face face)
     {
-        Face oldFace = GetFaceAt(posOnDice);
-        Face newFace = Instantiate(facePrefab, transform);
-        newFace.transform.rotation= oldFace.transform.rotation;
-        int index = listFaces.IndexOf(oldFace);
-        Destroy(oldFace.gameObject);
-        listFaces[index] = newFace;
+
+        Face oldFace = GetFaceAt(posOnDice, out int index);
+        if(face._value != -1)
+        {
+            oldFace._value = face._value;
+        }
+        if (face.has_material)
+        {
+            oldFace.GetComponent<MeshRenderer>().sharedMaterial = face.GetComponent<MeshRenderer>().sharedMaterial;
+        }
+        oldFace.UpdateFaceValue();
+        listFaces[index] = oldFace;
+
+
     }
 
     public void UpdatesFacesPos()
@@ -114,12 +113,14 @@ public class Dice : MonoBehaviour
         }
     }
 
-    public Face GetFaceAt(int posOnDice)
+    public Face GetFaceAt(int posOnDice , out int index)
     {
+        index = 0;
         for (int i = 0; i < 6; i++)
         {
             if (listFaces[i]._facePosOnDice == posOnDice)
             {
+                index = i;
                 return (listFaces[i]);
             }
         }

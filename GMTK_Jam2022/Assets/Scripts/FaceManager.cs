@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FaceManager : MonoBehaviour
 {
-    public List<Face> allFacesPrefabs ;
     public List<Vector3Int> listPosOnDice;
     public static FaceManager instance;
 
